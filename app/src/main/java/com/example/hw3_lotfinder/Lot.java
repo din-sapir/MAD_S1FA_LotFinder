@@ -38,12 +38,4 @@ public class Lot implements Serializable {
     public int getDistance() {
         return Distance;
     }
-
-    public String isFar(){
-        if (Distance < 1000){
-            return "Close";
-        } else {
-            return "Far";
-        }
-    }
 }

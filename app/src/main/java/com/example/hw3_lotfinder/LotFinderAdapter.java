@@ -50,8 +50,6 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(),LotActivity.class);
                 intent.putExtra("lot", lot);
-//                v.getContext().startActivity(intent);
-//                intent.putExtra("lot", lot);
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         (Activity) v.getContext(),
                         holder.card,

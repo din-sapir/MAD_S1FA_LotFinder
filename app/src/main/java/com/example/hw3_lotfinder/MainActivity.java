@@ -15,8 +15,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 // Main activity displaying a list of parking lots
 public class MainActivity extends AppCompatActivity {
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Initialize RecyclerView
         RecyclerView rv = findViewById(R.id.rv);
@@ -68,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         // Handle switch toggle to navigate to MapView
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {  // If turned ON, open MapView
+                // throw new RuntimeException("Test Crash"); // Force a crash
                 Intent intent = new Intent(MainActivity.this, MapView.class);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Smooth transition

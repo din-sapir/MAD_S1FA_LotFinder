@@ -20,6 +20,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 // Main activity displaying a list of parking lots
 public class MainActivity extends AppCompatActivity {
 
+    // Declare the Firebase Analytics object
     private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Obtain the FirebaseAnalytics instance.
+        // Obtain the FirebaseAnalytics instance
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Initialize RecyclerView

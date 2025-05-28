@@ -5,25 +5,42 @@ import java.io.Serializable;
 // Model class representing a parking lot
 public class Lot implements Serializable {
 
+    // Firestore identification variable
+    private String ID;
     private String Name;
-    private double Rating;
+    private String Rating;
     private String Prices;
     private String Vacancy;
-    private int Distance;
+    private String Distance;
 
-    public Lot(String name, double rating, String prices, String vacancy, int distance) {
+    public Lot(String name, String rating, String prices, String vacancy, String distance) {
         this.Name = name;
         this.Rating = rating;
         this.Prices = prices;
         this.Vacancy = vacancy;
         this.Distance = distance;
+        this.ID = String.valueOf(System.currentTimeMillis());
+    }
+
+    public Lot(String name, String rating, String prices, String vacancy, String distance, String id) {
+        this.Name = name;
+        this.Rating = rating;
+        this.Prices = prices;
+        this.Vacancy = vacancy;
+        this.Distance = distance;
+        this.ID = id;
+    }
+
+    // Firestore identifier getter
+    public String getID() {
+        return ID;
     }
 
     public String getName() {
         return Name;
     }
 
-    public double getRating() {
+    public String getRating() {
         return Rating;
     }
 
@@ -35,7 +52,7 @@ public class Lot implements Serializable {
         return Vacancy;
     }
 
-    public int getDistance() {
+    public String getDistance() {
         return Distance;
     }
 }

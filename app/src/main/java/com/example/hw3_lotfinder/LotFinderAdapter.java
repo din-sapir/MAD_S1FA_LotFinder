@@ -6,26 +6,57 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
 // Adapter for managing parking lot data in RecyclerView
 public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
 
+    // Connect to firebase and give us the instance we want to work with
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private List<Lot> lots; // List of parking lots
 
     public LotFinderAdapter() {
         lots = new ArrayList<>();
-        // Adding initial parking lot data
-        lots.add(new Lot("Carmel 1", 4.8, "24\n4\n100\n500\n40\n7", "51/64", 1100));
-        lots.add(new Lot("Upper Dizengoff", 3.2, "20\n4\n100\n550\n30\n8", "35/70", 800));
-        lots.add(new Lot("Frishman Lot", 2.2, "20\n5\n100\n500\n30\n7", "51/64", 600));
-        lots.add(new Lot("Carmel 2", 5, "24\n4\n100\n600\n40\n8", "51/64", 900));
-        lots.add(new Lot("Golda Lot", 3.5, "25\n6\n120\n550\n40\n9", "12/40", 800));
-        lots.add(new Lot("Bazel Lot", 4.8, "18\n4\n180\n480\n35\n7", "0/64", 400));
-        lots.add(new Lot("Dov Nov Lot", 1.7, "0\n6\n70\n450\n35\n15", "0/32", 1200));
+        // A-sync gathering of all data in the database whilst checking if the action is successful to remove and repopulate the list
+        db.collection("Lots").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    lots.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Lot lot = new Lot(document.get("Name").toString(), document.get("Rating").toString(), document.get("Prices").toString(), document.get("Vacancy").toString(), document.get("Distance").toString(), document.get("ID").toString());
+                        lots.add(lot);
+                    }
+                    notifyDataSetChanged();
+                }
+            }
+
+        });
+        // Continuous updating of the list when a change occurs in Firebase database
+        db.collection("Lots").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                lots.clear();
+                for (QueryDocumentSnapshot document : value) {
+                    Lot c = new Lot(document.get("Name").toString(), document.get("Rating").toString(), document.get("Prices").toString(), document.get("Vacancy").toString(), document.get("Distance").toString(), document.get("ID").toString());
+                    lots.add(c);
+                }
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @NonNull

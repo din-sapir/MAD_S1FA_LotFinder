@@ -79,7 +79,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="108dp"
+            android:layout_marginTop="40dp"
             android:layout_marginEnd="24dp"
             app:cardBackgroundColor="#0341E1"
             app:cardCornerRadius="16dp"
@@ -162,9 +162,11 @@
                     android:id="@+id/imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/ic_menu_mylocation"
-                    tools:layout_editor_absoluteX="313dp"
-                    tools:layout_editor_absoluteY="8dp" />
+                    android:layout_marginStart="32dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textView4"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@android:drawable/ic_menu_mylocation" />
 
                 <Button
                     android:id="@+id/btn_location"
@@ -216,10 +218,11 @@
             android:id="@+id/btn_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="-6dp"
-            android:layout_marginBottom="-6dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
             android:clickable="true"
             app:backgroundTint="#055E8E"
+            app:elevation="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_dialog_info" />

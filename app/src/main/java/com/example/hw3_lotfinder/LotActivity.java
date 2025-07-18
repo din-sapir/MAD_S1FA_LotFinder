@@ -71,12 +71,12 @@ public class LotActivity extends AppCompatActivity {
 
         // When Google Maps button is clicked, show a Toast
         googleMapsButton.setOnClickListener(v ->
-                Toast.makeText(LotActivity.this, "Will close app and open Google Maps\n(Relevant for 2nd Semester)", Toast.LENGTH_LONG).show()
+                Toast.makeText(LotActivity.this, "Will close app and open Google Maps", Toast.LENGTH_LONG).show()
         );
 
         // When Waze button is clicked, show a Toast
         wazeButton.setOnClickListener(v ->
-                Toast.makeText(LotActivity.this, "Will close app and open Waze\n(Relevant for 2nd Semester)", Toast.LENGTH_LONG).show()
+                Toast.makeText(LotActivity.this, "Will close app and open Waze", Toast.LENGTH_LONG).show()
         );
     }
 }

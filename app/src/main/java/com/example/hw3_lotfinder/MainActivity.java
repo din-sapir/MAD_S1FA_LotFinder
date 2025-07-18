@@ -36,6 +36,19 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Get the latitude, longitude, and query string from the intent + Sorttype
+        Bundle extras = getIntent().getExtras();
+        String lat = "0.0";
+        String lng = "0.0";
+        String query = "";
+        String sortType = "Distance";
+        if (extras != null) {
+            lat = extras.getString("lat");
+            lng = extras.getString("lng");
+            query = extras.getString("query");
+            sortType = extras.getString("sort");
+        }
+
         // Obtain the FirebaseAnalytics instance
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -46,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up RecyclerView layout and adapter
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1);
         rv.setLayoutManager(layoutManager);
-        LotFinderAdapter adapter = new LotFinderAdapter();
+        LotFinderAdapter adapter = new LotFinderAdapter(sortType);
         rv.setAdapter(adapter);
 
         // Set the status bar color

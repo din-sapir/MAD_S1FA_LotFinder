@@ -74,9 +74,9 @@ public class LotSearch extends AppCompatActivity {
         });
 
 
-        EditText locationET = findViewById(R.id.PT_Search);
+        EditText locationET = findViewById(R.id.pt_search);
         Button submit_btn = findViewById(R.id.btn_continue);
-        RadioGroup radioGroup = findViewById(R.id.radioGroup); // You must set this ID in the XML!
+        RadioGroup radioGroup = findViewById(R.id.radioGroup);
         RadioButton radioVacancy = findViewById(R.id.radioButton_Vacancy);
         RadioButton radioDistance = findViewById(R.id.radioButton_Distance);
 

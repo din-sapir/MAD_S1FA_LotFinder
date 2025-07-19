@@ -4,8 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
-import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,9 +24,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 public class MapView extends AppCompatActivity {
 
@@ -44,7 +50,6 @@ public class MapView extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_map_view);
 
-        // Apply system bar insets to avoid UI overlap
         View statusBarBackground = findViewById(R.id.statusBarBackground);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -53,7 +58,7 @@ public class MapView extends AppCompatActivity {
             return insets;
         });
 
-        // Status bar color
+        // Set status bar color
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.status_bar_color));
@@ -95,13 +100,9 @@ public class MapView extends AppCompatActivity {
             sort = extras.getString("sort", "Distance");
         }
 
-
         // Initialize map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        String finalLat = lat;
-        String finalLng = lng;
-        String finalQuery = query;
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -112,35 +113,67 @@ public class MapView extends AppCompatActivity {
                 if (usePreciseLocation) {
                     enableMyLocation();
                 } else {
-                    LatLng pos = new LatLng(Float.parseFloat(finalLat), Float.parseFloat(finalLng));
-                    mMap.addMarker(new MarkerOptions().position(pos).title(finalQuery));
+                    LatLng pos = new LatLng(Float.parseFloat(lat), Float.parseFloat(lng));
+                    mMap.addMarker(new MarkerOptions().position(pos).title(query));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
                 }
+
+                fetchDataFromFirebase(); // Draw blue lot markers
             }
+        });
+    }
 
-            private void enableMyLocation() {
-                if (ContextCompat.checkSelfPermission(MapView.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        || ContextCompat.checkSelfPermission(MapView.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                    mMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
 
-                    mMap.setOnMyLocationChangeListener(location -> {
-                        if (location != null) {
-                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            mMap.clear(); // Remove old markers
-                            mMap.addMarker(new MarkerOptions().position(currentLocation).title("Your Location"));
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f));
-                            mMap.setOnMyLocationChangeListener(null); // Only once
+            mMap.setOnMyLocationChangeListener(location -> {
+                if (location != null) {
+                    LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.clear();
+                    mMap.addMarker(new MarkerOptions().position(currentLocation).title("Your Location"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f));
+                    mMap.setOnMyLocationChangeListener(null);
+                }
+            });
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    },
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    private void fetchDataFromFirebase() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Lots").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        try {
+                            String name = document.get("Name").toString();
+                            String lotLat = document.get("lat").toString();
+                            String lotLng = document.get("lng").toString();
+
+                            LatLng lotPosition = new LatLng(Double.parseDouble(lotLat), Double.parseDouble(lotLng));
+                            mMap.addMarker(new MarkerOptions()
+                                    .position(lotPosition)
+                                    .title(name)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+                        } catch (Exception e) {
+                            Log.e("MapView", "Error parsing lot coordinates", e);
                         }
-                    });
-
+                    }
                 } else {
-                    ActivityCompat.requestPermissions(MapView.this,
-                            new String[]{
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                            },
-                            LOCATION_PERMISSION_REQUEST_CODE);
+                    Log.e("MapView", "Error loading lots from Firestore", task.getException());
                 }
             }
         });

@@ -1,0 +1,34 @@
+[
+  {
+    "featureType": "poi",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },
+  {
+    "featureType": "road",
+    "stylers": [
+      { "saturation": -100 },
+      { "lightness": 30 }
+    ]
+  },
+  {
+    "featureType": "water",
+    "stylers": [
+      { "color": "#c9dff9" }
+    ]
+  }
+]

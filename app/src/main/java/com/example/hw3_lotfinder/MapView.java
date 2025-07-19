@@ -26,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 public class MapView extends AppCompatActivity {
 
@@ -105,7 +106,8 @@ public class MapView extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
                 mMap = googleMap;
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapView.this, R.raw.map_style));
+                mMap.getUiSettings().setZoomControlsEnabled(true);
 
                 if (usePreciseLocation) {
                     enableMyLocation();

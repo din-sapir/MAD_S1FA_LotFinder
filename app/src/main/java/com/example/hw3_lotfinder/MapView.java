@@ -39,11 +39,14 @@ public class MapView extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_map_view);
 
+        View statusBarBackground = findViewById(R.id.statusBarBackground);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            statusBarBackground.getLayoutParams().height = systemBars.top;
+            statusBarBackground.requestLayout();
             return insets;
         });
+
 
         // Status bar color
         Window window = this.getWindow();

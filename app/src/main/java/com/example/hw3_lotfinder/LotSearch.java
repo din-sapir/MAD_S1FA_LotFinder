@@ -128,9 +128,7 @@ public class LotSearch extends AppCompatActivity {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            //TextView resultTV = findViewById(R.id.resultTV);
-                            //resultTV.setText(lat+", "+lng);
-                            Intent i = new Intent(LotSearch.this,MainActivity.class);
+                            Intent i = new Intent(LotSearch.this,MapView.class);
                             //Intent a = new Intent(LotSearch.this,LotFinderAdapter.class);
                             i.putExtra("lat",lat);
                             i.putExtra("lng",lng);

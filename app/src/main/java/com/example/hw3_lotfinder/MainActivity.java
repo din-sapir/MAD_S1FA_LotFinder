@@ -23,6 +23,11 @@ public class MainActivity extends AppCompatActivity {
     // Declare the Firebase Analytics object
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    private String lat = "0.0";
+    private String lng = "0.0";
+    private String query = "";
+    private String sortType = "Distance";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the latitude, longitude, and query string from the intent + Sorttype
         Bundle extras = getIntent().getExtras();
-        String lat = "0.0";
-        String lng = "0.0";
-        String query = "";
-        String sortType = "Distance";
+
         if (extras != null) {
             lat = extras.getString("lat");
             lng = extras.getString("lng");
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up RecyclerView layout and adapter
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1);
         rv.setLayoutManager(layoutManager);
-        LotFinderAdapter adapter = new LotFinderAdapter(sortType);
+        LotFinderAdapter adapter = new LotFinderAdapter(sortType, lat, lng);
         rv.setAdapter(adapter);
 
         // Set the status bar color
@@ -91,11 +93,14 @@ public class MainActivity extends AppCompatActivity {
         // Handle switch toggle to navigate to MapView
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {  // If turned ON, open MapView
-                // throw new RuntimeException("Test Crash"); // Force a crash
                 Intent intent = new Intent(MainActivity.this, MapView.class);
+                intent.putExtra("lat", lat);
+                intent.putExtra("lng", lng);
+                intent.putExtra("query", query);
+                intent.putExtra("sort", sortType);
                 startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Smooth transition
-                finish(); // Close MainActivity to prevent returning via the back button
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
             }
         });
     }

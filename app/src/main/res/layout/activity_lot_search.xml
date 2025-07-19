@@ -62,6 +62,13 @@
                 android:checked="true"
                 android:text="Distance"
                 android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/radioButton_Rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rating"
+                android:textSize="16sp" />
         </RadioGroup>
 
         <TextView

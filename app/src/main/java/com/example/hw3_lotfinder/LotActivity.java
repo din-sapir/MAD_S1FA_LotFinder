@@ -22,9 +22,12 @@ public class LotActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_lot);
 
+        // Apply system bar insets to avoid UI overlap
+        View statusBarBackground = findViewById(R.id.statusBarBackground);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            statusBarBackground.getLayoutParams().height = systemBars.top;
+            statusBarBackground.requestLayout();
             return insets;
         });
 
@@ -39,7 +42,7 @@ public class LotActivity extends AppCompatActivity {
         TextView tv_name = findViewById(R.id.tv_name);
 
         // Set lot details in TextViews
-        tv_distance.setText(lot.getDistance() + "m");
+        tv_distance.setText(lot.getDistance());
         tv_vacancy.setText(lot.getVacancy());
         tv_prices.setText(lot.getPrices());
         tv_name.setText(lot.getName());

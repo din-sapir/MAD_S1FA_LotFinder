@@ -26,10 +26,15 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private List<Lot> lots;
     private String sortType;
+    private String userLatStr;
+    private String userLngStr;
 
-    public LotFinderAdapter(String sortType) {
+
+    public LotFinderAdapter(String sortType, String userLat, String userLng) {
         lots = new ArrayList<>();
         this.sortType = sortType;
+        this.userLatStr = userLat;
+        this.userLngStr = userLng;
 
         db.collection("Lots").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -42,9 +47,17 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
                                 document.get("Rating").toString(),
                                 document.get("Prices").toString(),
                                 document.get("Vacancy").toString(),
-                                document.get("Distance").toString(),
+                                document.get("lat").toString(),
+                                document.get("lng").toString(),
                                 document.get("ID").toString()
                         );
+                        try {
+                            double lat = Double.parseDouble(userLatStr);
+                            double lng = Double.parseDouble(userLngStr);
+                            lot.calculateDistance(lat, lng);
+                        } catch (NumberFormatException e) {
+                            // Optional: you can leave it empty or log it
+                        }
                         lots.add(lot);
                     }
                     lots = sortedLots(lots);
@@ -64,9 +77,17 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
                                 document.get("Rating").toString(),
                                 document.get("Prices").toString(),
                                 document.get("Vacancy").toString(),
-                                document.get("Distance").toString(),
+                                document.get("lat").toString(),
+                                document.get("lng").toString(),
                                 document.get("ID").toString()
                         );
+                        try {
+                            double lat = Double.parseDouble(userLatStr);
+                            double lng = Double.parseDouble(userLngStr);
+                            lot.calculateDistance(lat, lng);
+                        } catch (NumberFormatException e) {
+                            // Optional: you can leave it empty or log it
+                        }
                         lots.add(lot);
                     }
                     lots = sortedLots(lots);
@@ -80,12 +101,28 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
         List<Lot> sorted = new ArrayList<>(lots);
 
         if ("Vacancy".equalsIgnoreCase(sortType)) {
+            // Sort by vacancy (descending)
             sorted.sort((a, b) -> {
                 int vacantA = parseVacantSpots(a.getVacancy());
                 int vacantB = parseVacantSpots(b.getVacancy());
                 return Integer.compare(vacantB, vacantA);
             });
+        } else if ("Rating".equalsIgnoreCase(sortType)) {
+            // Sort by rating (descending), zero-vacancy lots always last
+            sorted.sort((a, b) -> {
+                int vacantA = parseVacantSpots(a.getVacancy());
+                int vacantB = parseVacantSpots(b.getVacancy());
+
+                // Push lots with zero vacancy to the bottom
+                if (vacantA == 0 && vacantB != 0) return 1;
+                if (vacantB == 0 && vacantA != 0) return -1;
+
+                float ratingA = parseRating(a.getRating());
+                float ratingB = parseRating(b.getRating());
+                return Float.compare(ratingB, ratingA); // Descending
+            });
         } else {
+            // Default: sort by distance (ascending), zero-vacancy lots last
             sorted.sort((a, b) -> {
                 int vacantA = parseVacantSpots(a.getVacancy());
                 int vacantB = parseVacantSpots(b.getVacancy());
@@ -102,6 +139,8 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
         return sorted;
     }
 
+
+
     private int parseVacantSpots(String vacancy) {
         try {
             String[] parts = vacancy.split("/");
@@ -110,6 +149,15 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
             return 0;
         }
     }
+
+    private float parseRating(String ratingStr) {
+        try {
+            return Float.parseFloat(ratingStr);
+        } catch (NumberFormatException e) {
+            return 0f; // Treat invalid/missing ratings as lowest
+        }
+    }
+
 
     private double parseDistance(String distance) {
         try {

@@ -29,6 +29,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapView extends AppCompatActivity {
 
+    private String lat;
+    private String lng;
+    private String query;
+    private String sort;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private GoogleMap mMap;
     private boolean usePreciseLocation = false;
@@ -39,6 +43,7 @@ public class MapView extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_map_view);
 
+        // Apply system bar insets to avoid UI overlap
         View statusBarBackground = findViewById(R.id.statusBarBackground);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -46,7 +51,6 @@ public class MapView extends AppCompatActivity {
             statusBarBackground.requestLayout();
             return insets;
         });
-
 
         // Status bar color
         Window window = this.getWindow();
@@ -71,6 +75,10 @@ public class MapView extends AppCompatActivity {
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!isChecked) {
                 Intent intent = new Intent(MapView.this, MainActivity.class);
+                intent.putExtra("lat", lat);
+                intent.putExtra("lng", lng);
+                intent.putExtra("query", query);
+                intent.putExtra("sort", sort);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 finish();
@@ -79,17 +87,13 @@ public class MapView extends AppCompatActivity {
 
         // Get intent extras
         Bundle extras = getIntent().getExtras();
-        String lat = "0.0";
-        String lng = "0.0";
-        String query = "";
-        String sort = "Distance";
         if (extras != null) {
             lat = extras.getString("lat", "0.0");
             lng = extras.getString("lng", "0.0");
             query = extras.getString("query", "");
             sort = extras.getString("sort", "Distance");
-            usePreciseLocation = extras.getBoolean("usePreciseLocation", false);
         }
+
 
         // Initialize map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

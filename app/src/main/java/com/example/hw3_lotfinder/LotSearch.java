@@ -165,7 +165,10 @@ public class LotSearch extends AppCompatActivity {
         int selectedId = radioGroup.getCheckedRadioButtonId();
         if (selectedId == R.id.radioButton_Vacancy) {
             return "Vacancy";
-        } else {
+        } else if (selectedId == R.id.radioButton_Rating) {
+            return "Rating";
+        }
+        else {
             return "Distance";
         }
     }

@@ -92,7 +92,6 @@ public class Lot implements Serializable {
                 }
             }
         } catch (Exception e) {
-            this.Distance = "-1";
         }
     }
 }

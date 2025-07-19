@@ -27,12 +27,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapView extends AppCompatActivity {
 
@@ -43,6 +47,7 @@ public class MapView extends AppCompatActivity {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private GoogleMap mMap;
     private boolean usePreciseLocation = false;
+    private final Map<Marker, Lot> markerLotMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +63,10 @@ public class MapView extends AppCompatActivity {
             return insets;
         });
 
-        // Set status bar color
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.status_bar_color));
 
-        // Gradient background
         int white = getResources().getColor(R.color.white);
         int lightBlue = getResources().getColor(R.color.light_blue);
         GradientDrawable gradientDrawable = new GradientDrawable(
@@ -75,7 +78,6 @@ public class MapView extends AppCompatActivity {
         View rootView = findViewById(android.R.id.content);
         rootView.setBackground(gradientDrawable);
 
-        // View switch
         Switch switchView = findViewById(R.id.s_ViewSwitch);
         switchView.setChecked(true);
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -91,7 +93,6 @@ public class MapView extends AppCompatActivity {
             }
         });
 
-        // Get intent extras
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             lat = extras.getString("lat", "0.0");
@@ -100,7 +101,6 @@ public class MapView extends AppCompatActivity {
             sort = extras.getString("sort", "Distance");
         }
 
-        // Initialize map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -118,7 +118,19 @@ public class MapView extends AppCompatActivity {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
                 }
 
-                fetchDataFromFirebase(); // Draw blue lot markers
+                fetchDataFromFirebase();
+
+                mMap.setOnMarkerClickListener(marker -> {
+                    Lot clickedLot = markerLotMap.get(marker);
+                    if (clickedLot != null) {
+                        Intent intent = new Intent(MapView.this, LotActivity.class);
+                        intent.putExtra("lot", clickedLot);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.zoom_enter, R.anim.zoom_exit);
+                        return true;
+                    }
+                    return false;
+                });
             }
         });
     }
@@ -161,12 +173,22 @@ public class MapView extends AppCompatActivity {
                             String name = document.get("Name").toString();
                             String lotLat = document.get("lat").toString();
                             String lotLng = document.get("lng").toString();
+                            String rating = document.get("Rating").toString();
+                            String prices = document.get("Prices").toString();
+                            String vacancy = document.get("Vacancy").toString();
+
+                            Lot lot = new Lot(name, rating, prices, vacancy, lotLat, lotLng);
+
+                            // ✅ FIX: Calculate distance from selected lat/lng
+                            lot.calculateDistance(Double.parseDouble(lat), Double.parseDouble(lng));
 
                             LatLng lotPosition = new LatLng(Double.parseDouble(lotLat), Double.parseDouble(lotLng));
-                            mMap.addMarker(new MarkerOptions()
+                            Marker marker = mMap.addMarker(new MarkerOptions()
                                     .position(lotPosition)
                                     .title(name)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+                            markerLotMap.put(marker, lot);
 
                         } catch (Exception e) {
                             Log.e("MapView", "Error parsing lot coordinates", e);

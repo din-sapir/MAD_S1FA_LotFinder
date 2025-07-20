@@ -2,7 +2,6 @@ package com.example.hw3_lotfinder;
 
 import java.io.Serializable;
 
-// Model class representing a parking lot
 public class Lot implements Serializable {
 
     private String ID;
@@ -13,6 +12,7 @@ public class Lot implements Serializable {
     private String LAT;
     private String LNG;
     private String Distance = "-1";
+    private double distanceInMeters = -1;
 
     public Lot(String name, String rating, String prices, String vacancy, String lat, String lng) {
         this.Name = name;
@@ -66,6 +66,10 @@ public class Lot implements Serializable {
         return Distance;
     }
 
+    public double getDistanceInMeters() {
+        return distanceInMeters;
+    }
+
     public void calculateDistance(double userLat, double userLng) {
         try {
             double lotLat = Double.parseDouble(this.LAT);
@@ -73,8 +77,7 @@ public class Lot implements Serializable {
 
             float[] result = new float[1];
             android.location.Location.distanceBetween(userLat, userLng, lotLat, lotLng, result);
-
-            float distanceInMeters = result[0];
+            distanceInMeters = result[0];
 
             if (distanceInMeters <= 999) {
                 this.Distance = String.format("%.0f", distanceInMeters) + "m";
@@ -92,6 +95,7 @@ public class Lot implements Serializable {
                 }
             }
         } catch (Exception e) {
+            distanceInMeters = Double.MAX_VALUE;
         }
     }
 }

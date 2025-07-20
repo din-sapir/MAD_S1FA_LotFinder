@@ -130,8 +130,8 @@ public class LotFinderAdapter extends RecyclerView.Adapter<LotViewHolder> {
                 if (vacantA == 0 && vacantB != 0) return 1;
                 if (vacantB == 0 && vacantA != 0) return -1;
 
-                double distA = parseDistance(a.getDistance());
-                double distB = parseDistance(b.getDistance());
+                double distA = a.getDistanceInMeters();
+                double distB = b.getDistanceInMeters();
                 return Double.compare(distA, distB);
             });
         }

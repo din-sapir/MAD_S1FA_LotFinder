@@ -30,11 +30,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+/**
+ * StartScreen Activity
+ * --------------------
+ * Landing screen that handles Google Sign-In authentication with
+ * introductory animations for logo and background.
+ */
 public class StartScreen extends AppCompatActivity {
 
+    // Google Sign-In related
     GoogleSignInClient mGoogleSignInClient;
     ActivityResultLauncher<Intent> signInLauncher;
 
+    // Animation timing constants
     private static final int LOGO_START_DELAY = 200;
     private static final int SLIDE_IN_DURATION = 800;
     private static final int BACKGROUND_FADE_DELAY = LOGO_START_DELAY + SLIDE_IN_DURATION;
@@ -42,6 +50,9 @@ public class StartScreen extends AppCompatActivity {
     private ImageView logo;
     private CardView signInCard;
 
+    /**
+     * Initializes UI, sets up Google Sign-In, and plays intro animations.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,17 +60,20 @@ public class StartScreen extends AppCompatActivity {
         setContentView(R.layout.activity_start_screen);
 
         View mainLayout = findViewById(R.id.main);
-        logo = findViewById(R.id.imageView3);
-        signInCard = findViewById(R.id.cv_signin);
-        signInCard.setVisibility(View.INVISIBLE); // start hidden
+        logo = findViewById(R.id.imageView3);                 // Logo image
+        signInCard = findViewById(R.id.cv_signin);            // Sign-in card container
+        signInCard.setVisibility(View.INVISIBLE);             // Hide sign-in card initially
 
+        // Apply system window insets (for immersive display)
         ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Configure Google Sign-In
+        // -----------------------------
+        // Google Sign-In Configuration
+        // -----------------------------
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN
         ).requestEmail()
@@ -68,6 +82,7 @@ public class StartScreen extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
 
+        // Handle result from Google Sign-In intent
         signInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -79,33 +94,38 @@ public class StartScreen extends AppCompatActivity {
                 }
         );
 
+        // Set listener for login button
         Button loginBtn = findViewById(R.id.btn_googlesignin);
         loginBtn.setOnClickListener(v -> {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             signInLauncher.launch(signInIntent);
         });
 
-        // 1. Delay logo slide-in animation by 200ms
+        // -----------------------------
+        // Animation Sequence
+        // -----------------------------
+
+        // 1. Slide logo in from top after short delay
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Animation slideIn = AnimationUtils.loadAnimation(this, R.anim.slide_in_top);
             logo.setVisibility(View.VISIBLE);
             logo.startAnimation(slideIn);
         }, LOGO_START_DELAY);
 
-        // 2. Animate background to white after slide-in finishes
+        // 2. Fade background from blue to white after logo finishes sliding in
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             ObjectAnimator colorAnim = ObjectAnimator.ofObject(
                     mainLayout,
                     "backgroundColor",
                     new ArgbEvaluator(),
-                    Color.parseColor("#055E8E"),
-                    Color.WHITE
+                    Color.parseColor("#055E8E"), // initial color
+                    Color.WHITE                 // target color
             );
             colorAnim.setDuration(600);
             colorAnim.start();
         }, BACKGROUND_FADE_DELAY);
 
-        // 3. Show sign-in card
+        // 3. Fade in sign-in card after background transition
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             signInCard.setVisibility(View.VISIBLE);
             signInCard.setAlpha(0f);
@@ -113,26 +133,33 @@ public class StartScreen extends AppCompatActivity {
         }, BACKGROUND_FADE_DELAY);
     }
 
+    /**
+     * Handles Google Sign-In result and transitions to the next screen.
+     * @param task Task containing GoogleSignInAccount or failure
+     */
     private void handleSignInData(Task<GoogleSignInAccount> task) {
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
+
+            // Greet the user
             Toast.makeText(this, "Welcome " + account.getDisplayName(), Toast.LENGTH_LONG).show();
 
-            // Hide sign-in card
+            // Animate sign-in card fade out
             signInCard.animate().alpha(0f).setDuration(300).withEndAction(() -> {
                 signInCard.setVisibility(View.GONE);
 
-                // Slide logo out
+                // Animate logo slide out
                 Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_out_bottom);
                 logo.startAnimation(slideOut);
 
-                // Move to next screen after slide out
+                // Launch LotSearch activity after animation ends
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     Intent intent = new Intent(StartScreen.this, LotSearch.class);
                     startActivity(intent);
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    finish();
-                }, 700); // matches slide out duration
+                    finish(); // Close StartScreen activity
+                }, 700); // match slide out animation duration
+
             }).start();
 
         } catch (ApiException e) {

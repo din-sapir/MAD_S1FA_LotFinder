@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Switch;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -17,24 +18,37 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-// Main activity displaying a list of parking lots
+/**
+ * MainActivity
+ * ------------
+ * Displays a scrollable list of parking lots using a RecyclerView.
+ * Receives location and sorting data from LotSearch or MapView.
+ * Allows switching to map-based view via toggle switch.
+ */
 public class MainActivity extends AppCompatActivity {
 
-    // Declare the Firebase Analytics object
+    // Firebase Analytics instance for tracking user behavior
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    // Coordinates and query received via Intent
     private String lat = "0.0";
     private String lng = "0.0";
     private String query = "";
     private String sortType = "Distance";
 
+    /**
+     * Initializes the main activity layout, populates data into RecyclerView,
+     * and handles navigation to the map view.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        // --------------------------------------------
         // Apply system bar insets to avoid UI overlap
+        // --------------------------------------------
         View statusBarBackground = findViewById(R.id.statusBarBackground);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -43,9 +57,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Get the latitude, longitude, and query string from the intent + Sorttype
+        // --------------------------------------------
+        // Retrieve values passed via Intent
+        // --------------------------------------------
         Bundle extras = getIntent().getExtras();
-
         if (extras != null) {
             lat = extras.getString("lat");
             lng = extras.getString("lng");
@@ -53,46 +68,55 @@ public class MainActivity extends AppCompatActivity {
             sortType = extras.getString("sort");
         }
 
-        // Obtain the FirebaseAnalytics instance
+        // --------------------------------------------
+        // Initialize Firebase Analytics
+        // --------------------------------------------
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // Initialize RecyclerView
+        // --------------------------------------------
+        // Setup RecyclerView for displaying lots
+        // --------------------------------------------
         RecyclerView rv = findViewById(R.id.rv);
-        rv.setHasFixedSize(false); // Allows dynamic resizing of items
+        rv.setHasFixedSize(false); // Allows flexible item height
 
-        // Set up RecyclerView layout and adapter
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1);
         rv.setLayoutManager(layoutManager);
+
+        // Set adapter with sort type and coordinates
         LotFinderAdapter adapter = new LotFinderAdapter(sortType, lat, lng);
         rv.setAdapter(adapter);
 
-        // Set the status bar color
+        // --------------------------------------------
+        // Set system status bar color
+        // --------------------------------------------
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.status_bar_color));
 
-        // Define gradient colors for background
+        // --------------------------------------------
+        // Create and apply background gradient
+        // --------------------------------------------
         int white = getResources().getColor(R.color.white);
         int lightBlue = getResources().getColor(R.color.light_blue);
 
-        // Create a gradient background transitioning from white to light blue
         GradientDrawable gradientDrawable = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,  // Gradient direction
-                new int[]{white, white, lightBlue}       // Extended white before transition
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{white, white, lightBlue} // Fades to light blue from white
         );
         gradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
-        gradientDrawable.setGradientCenter(0.5f, 0.85f);  // Start transition at 85% of screen height
+        gradientDrawable.setGradientCenter(0.5f, 0.85f); // Start gradient lower on screen
 
-        // Apply the gradient background to the activity
         View rootView = findViewById(android.R.id.content);
         rootView.setBackground(gradientDrawable);
 
-        // Initialize switch for toggling between views
+        // --------------------------------------------
+        // Setup view switch toggle for navigating to map
+        // --------------------------------------------
         Switch switchView = findViewById(R.id.s_ViewSwitch);
 
-        // Handle switch toggle to navigate to MapView
+        // If toggled ON, switch to MapView
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {  // If turned ON, open MapView
+            if (isChecked) {
                 Intent intent = new Intent(MainActivity.this, MapView.class);
                 intent.putExtra("lat", lat);
                 intent.putExtra("lng", lng);
@@ -100,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("sort", sortType);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
+                finish(); // Close this activity to prevent stack build-up
             }
         });
     }

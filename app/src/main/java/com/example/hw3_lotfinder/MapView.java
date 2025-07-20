@@ -103,35 +103,43 @@ public class MapView extends AppCompatActivity {
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull GoogleMap googleMap) {
-                mMap = googleMap;
-                mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapView.this, R.raw.map_style));
-                mMap.getUiSettings().setZoomControlsEnabled(true);
+        mapFragment.getMapAsync(googleMap -> {
+            mMap = googleMap;
+            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapView.this, R.raw.map_style));
+            mMap.getUiSettings().setZoomControlsEnabled(true);
 
-                if (usePreciseLocation) {
-                    enableMyLocation();
-                } else {
-                    LatLng pos = new LatLng(Float.parseFloat(lat), Float.parseFloat(lng));
-                    mMap.addMarker(new MarkerOptions().position(pos).title(query));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
-                }
-
-                fetchDataFromFirebase();
-
-                mMap.setOnMarkerClickListener(marker -> {
-                    Lot clickedLot = markerLotMap.get(marker);
-                    if (clickedLot != null) {
-                        Intent intent = new Intent(MapView.this, LotActivity.class);
-                        intent.putExtra("lot", clickedLot);
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.zoom_enter, R.anim.zoom_exit);
-                        return true;
-                    }
-                    return false;
-                });
+            if (usePreciseLocation) {
+                enableMyLocation();
+            } else {
+                LatLng pos = new LatLng(Float.parseFloat(lat), Float.parseFloat(lng));
+                mMap.addMarker(new MarkerOptions().position(pos).title(query));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f));
             }
+
+            fetchDataFromFirebase();
+
+            mMap.setOnMarkerClickListener(marker -> {
+                Lot clickedLot = markerLotMap.get(marker);
+                if (clickedLot != null) {
+                    LatLng markerPosition = marker.getPosition();
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(markerPosition), 300, new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            Intent intent = new Intent(MapView.this, LotActivity.class);
+                            intent.putExtra("lot", clickedLot);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.zoom_enter, R.anim.zoom_exit);
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            // Do nothing if cancelled
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            });
         });
     }
 
@@ -164,39 +172,34 @@ public class MapView extends AppCompatActivity {
     private void fetchDataFromFirebase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("Lots").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        try {
-                            String name = document.get("Name").toString();
-                            String lotLat = document.get("lat").toString();
-                            String lotLng = document.get("lng").toString();
-                            String rating = document.get("Rating").toString();
-                            String prices = document.get("Prices").toString();
-                            String vacancy = document.get("Vacancy").toString();
+        db.collection("Lots").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    try {
+                        String name = document.get("Name").toString();
+                        String lotLat = document.get("lat").toString();
+                        String lotLng = document.get("lng").toString();
+                        String rating = document.get("Rating").toString();
+                        String prices = document.get("Prices").toString();
+                        String vacancy = document.get("Vacancy").toString();
 
-                            Lot lot = new Lot(name, rating, prices, vacancy, lotLat, lotLng);
+                        Lot lot = new Lot(name, rating, prices, vacancy, lotLat, lotLng);
+                        lot.calculateDistance(Double.parseDouble(lat), Double.parseDouble(lng));
 
-                            // ✅ FIX: Calculate distance from selected lat/lng
-                            lot.calculateDistance(Double.parseDouble(lat), Double.parseDouble(lng));
+                        LatLng lotPosition = new LatLng(Double.parseDouble(lotLat), Double.parseDouble(lotLng));
+                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                .position(lotPosition)
+                                .title(name)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
-                            LatLng lotPosition = new LatLng(Double.parseDouble(lotLat), Double.parseDouble(lotLng));
-                            Marker marker = mMap.addMarker(new MarkerOptions()
-                                    .position(lotPosition)
-                                    .title(name)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        markerLotMap.put(marker, lot);
 
-                            markerLotMap.put(marker, lot);
-
-                        } catch (Exception e) {
-                            Log.e("MapView", "Error parsing lot coordinates", e);
-                        }
+                    } catch (Exception e) {
+                        Log.e("MapView", "Error parsing lot coordinates", e);
                     }
-                } else {
-                    Log.e("MapView", "Error loading lots from Firestore", task.getException());
                 }
+            } else {
+                Log.e("MapView", "Error loading lots from Firestore", task.getException());
             }
         });
     }

@@ -110,7 +110,7 @@ public class LotSearch extends AppCompatActivity {
             double lat = location.getLatitude();
             double lng = location.getLongitude();
 
-            Intent i = new Intent(LotSearch.this, MapView.class);
+            Intent i = new Intent(LotSearch.this, MainActivity.class);
             i.putExtra("lat", String.valueOf(lat));
             i.putExtra("lng", String.valueOf(lng));
             i.putExtra("query", "Your Location");
@@ -147,7 +147,7 @@ public class LotSearch extends AppCompatActivity {
                 String finalLng = lng;
 
                 handler.post(() -> {
-                    Intent i = new Intent(LotSearch.this, MapView.class);
+                    Intent i = new Intent(LotSearch.this, MainActivity.class);
                     i.putExtra("lat", finalLat);
                     i.putExtra("lng", finalLng);
                     i.putExtra("query", query);

@@ -22,7 +22,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,9 +30,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,13 +123,14 @@ public class MapView extends AppCompatActivity {
                         public void onFinish() {
                             Intent intent = new Intent(MapView.this, LotActivity.class);
                             intent.putExtra("lot", clickedLot);
+                            intent.putExtra("fromMap", true);  // ← ADDED FLAG
                             startActivity(intent);
-                            overridePendingTransition(R.anim.zoom_enter, R.anim.zoom_exit);
+                            overridePendingTransition(R.anim.zoom_enter, 0);
                         }
 
                         @Override
                         public void onCancel() {
-                            // Do nothing if cancelled
+                            // Do nothing
                         }
                     });
                     return true;

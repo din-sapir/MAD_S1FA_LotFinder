@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1062718784584",
+    "project_id": "lotfinder-4edb6",
+    "storage_bucket": "lotfinder-4edb6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1062718784584:android:1fbee215e602020e66047d",
+        "android_client_info": {
+          "package_name": "com.example.hw3_lotfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1062718784584-hi29tb52selkphrpvso46gfcn42jd81j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hw3_lotfinder",
+            "certificate_hash": "8d0ebe5083277bb079564cdcf09737f043d03648"
+          }
+        },
+        {
+          "client_id": "1062718784584-0440s078f5altrphr8rp698mg8lnkjdj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE3Ey2Stg0Ot62RehIFSM_HwEs6zr9K2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1062718784584-0440s078f5altrphr8rp698mg8lnkjdj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

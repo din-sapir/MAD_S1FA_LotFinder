@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.example.hw3_lotfinder"
         minSdk 30
-        targetSdk 35
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -32,6 +32,7 @@ android {
 
 dependencies {
 
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
@@ -41,6 +42,10 @@ dependencies {
     implementation libs.firebase.firestore
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'com.google.android.gms:play-services-maps:19.2.0'
+    implementation libs.firebase.auth
+    implementation libs.credentials
+    implementation libs.credentials.play.services.auth
+    implementation libs.googleid
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

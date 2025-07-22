@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "1062718784584-kjaoo0hct0smdk2f2m8p7r0euc2illvk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hw3_lotfinder",
+            "certificate_hash": "45677dce210f479a85eb7c24c57b03a91fcb2861"
+          }
+        },
+        {
           "client_id": "1062718784584-0440s078f5altrphr8rp698mg8lnkjdj.apps.googleusercontent.com",
           "client_type": 3
         }

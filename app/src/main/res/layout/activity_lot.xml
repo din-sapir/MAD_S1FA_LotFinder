@@ -65,7 +65,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/bottomLine"
+                android:id="@+id/iv_bottomLine"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -77,13 +77,13 @@
                 app:srcCompat="@drawable/line" />
 
             <ImageView
-                android:id="@+id/LotfinderLogo"
+                android:id="@+id/iv_LotfinderLogo"
                 android:layout_width="160dp"
                 android:layout_height="128dp"
                 android:layout_marginStart="112dp"
                 android:layout_marginEnd="120dp"
                 android:layout_marginBottom="14dp"
-                app:layout_constraintBottom_toTopOf="@+id/bottomLine"
+                app:layout_constraintBottom_toTopOf="@+id/iv_bottomLine"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/lotfinderlogo" />
@@ -97,7 +97,7 @@
                 android:paddingBottom="0dp"
                 app:cardBackgroundColor="#055E8E"
                 app:cardCornerRadius="20dp"
-                app:layout_constraintBottom_toTopOf="@+id/LotfinderLogo"
+                app:layout_constraintBottom_toTopOf="@+id/iv_LotfinderLogo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -108,7 +108,7 @@
                     android:paddingBottom="0dp">
 
                     <ImageView
-                        android:id="@+id/imageView_wazeLogo"
+                        android:id="@+id/iv_wazelogo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
@@ -158,7 +158,7 @@
                     android:layout_height="match_parent">
 
                     <ImageView
-                        android:id="@+id/googleMapsLogo"
+                        android:id="@+id/iv_googleMapsLogo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
@@ -192,7 +192,7 @@
             </androidx.cardview.widget.CardView>
 
             <ImageView
-                android:id="@+id/navigateLine"
+                android:id="@+id/iv_navigateline"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="82dp"
@@ -212,7 +212,7 @@
                 android:text="Navigate With"
                 android:textColor="#001343"
                 android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/navigateLine"
+                app:layout_constraintBottom_toTopOf="@+id/iv_navigateline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/CardView_tariffmain" />
@@ -232,7 +232,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/titleLine"
+                android:id="@+id/iv_titleline"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="56dp"
@@ -253,7 +253,7 @@
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/titleLine">
+                app:layout_constraintTop_toBottomOf="@+id/iv_titleline">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -288,11 +288,11 @@
                         android:textSize="24sp"
                         app:layout_constraintBottom_toTopOf="@+id/tv_Far"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/vertical_Line"
+                        app:layout_constraintStart_toEndOf="@+id/iv_verticalline"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageView
-                        android:id="@+id/vertical_Line"
+                        android:id="@+id/iv_verticalline"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_marginStart="40dp"
@@ -332,7 +332,7 @@
                         android:textSize="24sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/vertical_Line"
+                        app:layout_constraintStart_toEndOf="@id/iv_verticalline"
                         app:layout_constraintTop_toBottomOf="@+id/tv_distance" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
@@ -367,7 +367,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageView
-                        android:id="@+id/price_Line"
+                        android:id="@+id/iv_priceline"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
@@ -387,7 +387,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/price_Line">
+                        app:layout_constraintTop_toBottomOf="@+id/iv_priceline">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
